@@ -1,0 +1,61 @@
+name: Deploy to AWS DevOps Platform
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    name: Provision Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        working-directory: ./terraform/environments/dev
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ./terraform/environments/dev
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./terraform/environments/dev
+        run: terraform apply -auto-approve
+
+  deploy-app:
+    name: Deploy Application
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 100.54.117.108
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/app
+            git pull origin main || true
+            docker-compose down
+            docker-compose up -d --build
+            docker-compose ps
+
