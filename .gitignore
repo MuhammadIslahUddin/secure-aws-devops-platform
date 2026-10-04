@@ -1,0 +1,21 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.lock.hcl
+
+# SSH Keys
+*.pem
+id_rsa*
+id_ed25519*
+
+# Docker
+docker-compose.yml
+.env
+
+# System
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/

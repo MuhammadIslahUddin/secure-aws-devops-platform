@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Multi-Tier AWS Platform | DevOps Portfolio — Islah</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #334155;
+        }
+        h1 {
+            font-size: 2.2rem;
+            color: #38bdf8;
+            margin-bottom: 0.5rem;
+        }
+        h2 {
+            font-size: 1.4rem;
+            color: #60a5fa;
+            margin: 1.5rem 0 0.8rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+            color: #93c5fd;
+            margin: 1rem 0 0.5rem;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #94a3b8;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #10b981;
+            color: #fff;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .tech-tag {
+            background: #0f172a;
+            border-left: 3px solid #38bdf8;
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+        }
+        ul {
+            padding-left: 1.5rem;
+            margin: 0.8rem 0;
+        }
+        li { margin: 0.5rem 0; }
+        a {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover { text-decoration: underline; }
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .highlight { color: #34d399; font-weight: 600; }
+        .warning { color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Secure Multi-Tier AWS Platform</h1>
+            <p class="subtitle">Production-Grade DevOps Portfolio Project</p>
+            <div class="status-badge">✅ LIVE & OPERATIONAL — DEV ENVIRONMENT</div>
+        </header>
+
+        <!-- About Me Section -->
+        <section class="card">
+            <h2>👨‍💻 About the Developer</h2>
+            <p><strong>Name:</strong> Islah</p>
+            <p><strong>Role:</strong> DevOps Engineer & Cloud Infrastructure Specialist</p>
+            <p><strong>Location:</strong> Karachi, Sindh, Pakistan</p>
+            <p><strong>Mission:</strong> Building secure, automated, and scalable cloud infrastructure following industry best practices — turning complex systems into reliable, maintainable, and observable platforms.</p>
+            <p style="margin-top: 0.8rem;">
+                <em>"Infrastructure is code. Security is not an afterthought — it’s built in from day one."</em>
+            </p>
+        </section>
+
+        <!-- Project Overview -->
+        <section class="card">
+            <h2>📋 Project Overview</h2>
+            <p>This project implements a <strong>defense-in-depth, zero-trust cloud architecture</strong> on Amazon Web Services, designed and deployed entirely through Infrastructure-as-Code (IaC). It demonstrates how enterprise-grade systems are built — with security, automation, and reliability as the core foundation.</p>
+            
+            <h3>Key Design Principles</h3>
+            <ul>
+                <li><span class="highlight">No public exposure:</span> Application and backend servers reside in private subnets with zero public IP addresses — unreachable directly from the internet.</li>
+                <li><span class="highlight">Least privilege:</span> Security groups enforce strict inbound/outbound rules — only explicitly allowed traffic flows.</li>
+                <li><span class="highlight">Centralized control:</span> All outbound traffic from private tiers routes through a dedicated forward proxy for logging, filtering, and caching.</li>
+                <li><span class="highlight">Automation-first:</span> Every resource is version-controlled and deployable in minutes — no manual console setup.</li>
+                <li><span class="highlight">Environment separation:</span> Distinct dev/prod configurations enable safe iteration before production changes.</li>
+            </ul>
+        </section>
+
+        <!-- Architecture Breakdown -->
+        <section class="card">
+            <h2>🏗️ Architecture Breakdown</h2>
+            
+            <h3>1. Public Edge Layer</h3>
+            <ul>
+                <li><strong>Application Load Balancer (ALB):</strong> Single public entry point — accepts HTTP traffic from anywhere and distributes it across frontend instances.</li>
+                <li>Future-ready for HTTPS/TLS (AWS Certificate Manager integration) and Web Application Firewall (WAF).</li>
+            </ul>
+
+            <h3>2. Outbound Gateway Layer</h3>
+            <ul>
+                <li><strong>Squid Forward Proxy:</strong> Acts as the sole internet gateway for private-tier workloads. Enforces access policies, logs all external requests, and reduces bandwidth via caching.</li>
+                <li>Port 8888 — accessible only from private application subnets.</li>
+            </ul>
+
+            <h3>3. Private Application Tier</h3>
+            <ul>
+                <li><strong>Frontend (Nginx):</strong> Serves the user interface. Receives traffic <em>only</em> from the ALB — never directly from the internet.</li>
+                <li><strong>Backend API (Python/Flask):</strong> Provides data services. Accepts connections <em>only</em> from the frontend tier.</li>
+                <li class="warning">⚠ Neither server has a public IP — administration requires VPN or bastion access.</li>
+            </ul>
+
+            <h3>4. Administration & Security Layer</h3>
+            <ul>
+                <li><strong>OpenVPN Server:</strong> Provides secure, encrypted tunnel for administrative access — SSH is never exposed publicly.</li>
+                <li><strong>Restricted SSH:</strong> Only permitted from your trusted IP or VPN address.</li>
+            </ul>
+        </section>
+
+        <!-- Tech Stack -->
+        <section class="card">
+            <h2>🛠️ Technology Stack</h2>
+            <div class="grid">
+                <div class="tech-tag">
+                    <strong>Cloud</strong><br>
+                    Amazon Web Services (VPC, EC2, ALB, CloudWatch)
+                </div>
+                <div class="tech-tag">
+                    <strong>IaC</strong><br>
+                    Terraform — modular, versioned, environment-aware
+                </div>
+                <div class="tech-tag">
+                    <strong>CI/CD</strong><br>
+                    GitHub Actions — validate → plan → apply
+                </div>
+                <div class="tech-tag">
+                    <strong>Containerization</strong><br>
+                    Docker — consistent builds & deployments
+                </div>
+                <div class="tech-tag">
+                    <strong>Frontend</strong><br>
+                    Nginx — high-performance web server
+                </div>
+                <div class="tech-tag">
+                    <strong>Backend</strong><br>
+                    Python 3 + Flask + Gunicorn
+                </div>
+                <div class="tech-tag">
+                    <strong>Network Security</strong><br>
+                    Squid Proxy + OpenVPN + Security Groups
+                </div>
+                <div class="tech-tag">
+                    <strong>Local Tools</strong><br>
+                    Ubuntu 26.04 · Git · AWS CLI v2
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Endpoints -->
+        <section class="card">
+            <h2>🔗 Service Endpoints</h2>
+            <ul>
+                <li><strong>Frontend UI:</strong> This page ✅</li>
+                <li><strong>Backend Health Check:</strong> <a href="/api/health" target="_blank">/api/health</a> — verifies private-tier API connectivity</li>
+                <li><strong>Infrastructure Code:</strong> <a href="https://github.com/your-username/secure-aws-platform" target="_blank">GitHub Repository</a></li>
+            </ul>
+        </section>
+
+        <!-- Roadmap -->
+        <section class="card">
+            <h2>🚀 What's Next</h2>
+            <ul>
+                <li>🔲 HTTPS with ACM-managed TLS certificates</li>
+                <li>🔲 Auto Scaling Groups — elasticity & fault tolerance</li>
+                <li>🔲 CloudWatch Dashboards — real-time observability</li>
+                <li>🔲 Trivy + SonarQube — automated vulnerability scanning</li>
+                <li>🔲 Production environment with stricter access controls</li>
+            </ul>
+        </section>
+
+        <footer class="footer">
+            <p>Built with precision by Islah · DevOps Engineer · Karachi, Pakistan</p>
+            <p>Portfolio Project · Secure Multi-Tier AWS Platform · © 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

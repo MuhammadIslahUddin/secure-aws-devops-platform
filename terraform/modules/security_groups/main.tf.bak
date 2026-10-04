@@ -1,0 +1,147 @@
+resource "aws_security_group" "alb" {
+  name        = "sg-alb-${var.environment}"
+  description = "ALB — HTTP from anywhere"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "alb-sg-${var.environment}" }
+}
+
+resource "aws_security_group" "squid" {
+  name        = "sg-squid-${var.environment}"
+  description = "Squid — Proxy from private tiers; SSH from admin IP"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 8888
+    to_port     = 8888
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.10.0/24", "10.0.11.0/24"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.trusted_admin_ip}/32"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "squid-sg-${var.environment}" }
+}
+
+resource "aws_security_group" "frontend" {
+  name        = "sg-frontend-${var.environment}"
+  description = "Frontend — HTTP from ALB; SSH from VPN/Admin"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.trusted_admin_ip}/32"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "frontend-sg-${var.environment}" }
+}
+
+resource "aws_security_group" "backend" {
+  name        = "sg-backend-${var.environment}"
+  description = "Backend — API from Frontend; SSH from VPN/Admin"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 8000
+    to_port         = 8000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.frontend.id]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.trusted_admin_ip}/32"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "backend-sg-${var.environment}" }
+}
+
+resource "aws_security_group" "vpn" {
+  name        = "sg-vpn-${var.environment}"
+  description = "VPN — OpenVPN + SSH from admin IP only"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 1194
+    to_port     = 1194
+    protocol    = "udp"
+    cidr_blocks = ["${var.trusted_admin_ip}/32"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.trusted_admin_ip}/32"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  tags = { Name = "vpn-sg-${var.environment}" }
+}
+
+variable "vpc_id" {}
+variable "environment" {}
+variable "trusted_admin_ip" {}
+
+output "alb_sg_id" { value = aws_security_group.alb.id }
+output "squid_sg_id" { value = aws_security_group.squid.id }
+output "frontend_sg_id" { value = aws_security_group.frontend.id }
+output "backend_sg_id" { value = aws_security_group.backend.id }
+output "vpn_sg_id" { value = aws_security_group.vpn.id }
