@@ -1,51 +1,17 @@
-name: Deploy to AWS DevOps Platform
+name: Deploy Portfolio App
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  terraform:
-    name: Provision Infrastructure
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.0
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Terraform Init
-        working-directory: ./terraform/environments/dev
-        run: terraform init
-
-      - name: Terraform Plan
-        working-directory: ./terraform/environments/dev
-        run: terraform plan
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        working-directory: ./terraform/environments/dev
-        run: terraform apply -auto-approve
-
-  deploy-app:
-    name: Deploy Application
-    needs: terraform
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Deploy via SSH
+      - name: Deploy to EC2 Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 100.54.117.108
@@ -53,9 +19,21 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            set -e
+            echo "✅ Connected to server"
+            
+            # Ensure app folder exists
+            mkdir -p ~/app
             cd ~/app
-            git pull origin main || true
-            docker-compose down
+            
+            # Pull latest code (if git repo on server)
+            # Or skip if files are copied directly
+            
+            echo "🔄 Restarting containers..."
+            docker-compose down || true
             docker-compose up -d --build
+            
+            echo "📊 Running containers:"
             docker-compose ps
-
+            
+            echo "✅ Deployment Complete!"
