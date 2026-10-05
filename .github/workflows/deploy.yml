@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy to EC2 Server
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 100.54.117.108
@@ -21,19 +21,16 @@ jobs:
           script: |
             set -e
             echo "✅ Connected to server"
-            
-            # Ensure app folder exists
-            mkdir -p ~/app
             cd ~/app
             
-            # Pull latest code (if git repo on server)
-            # Or skip if files are copied directly
+            echo "🔄 Pulling latest code..."
+            git stash push -m "temp" 2>/dev/null || true
+            git pull origin main
             
             echo "🔄 Restarting containers..."
             docker-compose down || true
             docker-compose up -d --build
             
-            echo "📊 Running containers:"
+            echo "📊 Status:"
             docker-compose ps
-            
-            echo "✅ Deployment Complete!"
+            echo "✅ Deployed!"
