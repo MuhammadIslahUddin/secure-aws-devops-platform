@@ -11,7 +11,7 @@ id_rsa*
 id_ed25519*
 
 # Docker
-docker-compose.yml
+
 .env
 
 # System
