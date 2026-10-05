@@ -55,7 +55,7 @@
             res.style.display = 'block';
             res.innerHTML = '⏳ Checking...';
             try {
-                const r = await fetch('http://100.54.117.108:5000/api/health');
+                const r = await fetch('http://3.238.189.198:5000/api/health');
                 const d = await r.json();
                 res.innerHTML = `✅ API LIVE — ${d.message}<br>Server time: ${d.timestamp}`;
             } catch (e) {
